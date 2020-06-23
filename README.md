@@ -14,7 +14,7 @@ Notes-App should allow users to create notes, view them, delete and update, as w
 * finnish basic frontend
 * migrate from sqlite to postgres
 * migrate from GORM to Kallax
-* add prometheus
+* add prometheus metrics
 * dockerize
 
 ## Building
