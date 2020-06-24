@@ -1,6 +1,7 @@
 package main
 
 import (
+    "context"
     "log"
 
     "github.com/gin-gonic/gin"
@@ -9,6 +10,7 @@ import (
     "github.com/mrtroian/notes/internal/database"
     "github.com/mrtroian/notes/internal/middleware"
     "github.com/mrtroian/notes/internal/rts"
+    "github.com/mrtroian/notes/internal/signals"
 )
 
 func main() {
@@ -16,17 +18,22 @@ func main() {
         log.Fatal(err)
     }
 
-    // initialize database
+    ctx, cancel := context.WithCancel(context.Background())
+    router := gin.Default()
     db, err := database.Initialize()
 
     if err != nil {
         log.Fatal(err)
     }
 
-    app := gin.Default()
-    app.Use(database.Add(db))
-    app.Use(middleware.JWTMiddleware())
-    web.ApplyRoute(app)
-    api.ApplyRoutes(app)
-    app.Run(":" + rts.GetPort())
+    signals.Handle(cancel)
+    router.Use(database.Add(db))
+    router.Use(middleware.JWTMiddleware())
+    api.ApplyRoutes(router)
+    web.ApplyRoute(router)
+    web.UseRouter(router)
+    web.Start()
+    defer web.Stop()
+
+    <-ctx.Done()
 }

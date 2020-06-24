@@ -15,6 +15,7 @@ import (
 
 type storage struct {
     port   string
+    host   string
     dbConf string
     dbPath string
     secret string
@@ -22,12 +23,22 @@ type storage struct {
 
 var runtimeStorage storage
 
-func newStorage(port, dbConf, dbPath, secret string) storage {
-    return storage{port, dbConf, dbPath, secret}
+func newStorage(port, host, dbConf, dbPath, secret string) storage {
+    return storage{
+        port:   port,
+        host:   host,
+        dbConf: dbConf,
+        dbPath: dbPath,
+        secret: secret,
+    }
 }
 
 func GetPort() string {
     return runtimeStorage.port
+}
+
+func GetHost() string {
+    return runtimeStorage.host
 }
 
 func GetDBConfig() string {
@@ -48,6 +59,10 @@ func IsValid() error {
 
     if len(s.port) == 0 {
         return errors.New("rts: cannot read PORT from env")
+    }
+
+    if len(s.host) == 0 {
+        return errors.New("rts: cannot read HOST from env")
     }
 
     if len(s.dbConf) == 0 {
@@ -74,6 +89,7 @@ func init() {
 
     runtimeStorage = newStorage(
         os.Getenv("PORT"),
+        os.Getenv("HOST"),
         os.Getenv("DB_CONF"),
         os.Getenv("SQLITE_PATH"),
         os.Getenv("SECRET_KEY"),
