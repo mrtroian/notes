@@ -7,10 +7,11 @@ import (
 	"syscall"
 )
 
-var sigChannel chan os.Signal
+var sigChannel = make(chan os.Signal)
 
 func Handle(cancel context.CancelFunc) {
 	go func() {
+		// kill -9 sounds not like a graceful
 		signal.Notify(sigChannel, syscall.SIGINT, syscall.SIGTERM)
 
 		for {
@@ -22,8 +23,4 @@ func Handle(cancel context.CancelFunc) {
 			}
 		}
 	}()
-}
-
-func init() {
-	sigChannel = make(chan os.Signal)
 }

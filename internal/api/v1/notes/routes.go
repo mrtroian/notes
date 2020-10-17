@@ -6,12 +6,12 @@ import (
 )
 
 func ApplyRoutes(r *gin.RouterGroup) {
-    notes := r.Group("/notes")
+    notes := r.Group("/notes", middleware.IsAuthorised)
     {
-        notes.POST("/", middleware.IsAuthorised, create)
-        notes.GET("/", middleware.IsAuthorised, retrieveAll)
-        notes.GET("/:id", middleware.IsAuthorised, retrieveOne)
-        notes.PATCH("/:id", middleware.IsAuthorised, update)
-        notes.DELETE("/:id", middleware.IsAuthorised, delete)
+        notes.POST("/", create)
+        notes.GET("/", retrieveAll)
+        notes.GET("/:id", retrieveOne)
+        notes.PATCH("/:id", update)
+        notes.DELETE("/:id", delete)
     }
 }

@@ -4,18 +4,17 @@ import (
     "strings"
 
     "github.com/gin-gonic/gin"
-    "github.com/mrtroian/notes/internal/common"
-    "github.com/mrtroian/notes/internal/database/models"
     "github.com/mrtroian/notes/internal/token"
+    "github.com/mrtroian/notes/internal/user"
 )
 
 func JWTMiddleware() gin.HandlerFunc {
     return func(c *gin.Context) {
-        var user models.User
-
         tokenString, err := c.Cookie("token")
 
         if err != nil {
+            // in case user cleaned up all the cookies
+            // but he stil has set auth header with valid token
             authorization := c.Request.Header.Get("Authorization")
 
             if len(authorization) == 0 {
@@ -30,6 +29,7 @@ func JWTMiddleware() gin.HandlerFunc {
             }
             tokenString = sp[1]
         }
+
         tokenData, err := token.Validate(tokenString)
 
         if err != nil {
@@ -37,9 +37,15 @@ func JWTMiddleware() gin.HandlerFunc {
             return
         }
 
-        user.Read(tokenData["user"].(common.JSON))
+        u, err := user.ReadJSON(tokenData["user"].(map[string]interface{}))
 
-        c.Set("user", user)
+        if err != nil {
+            c.Next()
+            return
+        }
+
+        // unauthorised users will not appear in gin.Context
+        c.Set("user", u)
         c.Set("token_expire", tokenData["exp"])
         c.Next()
     }
