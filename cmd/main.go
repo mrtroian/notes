@@ -3,37 +3,54 @@ package main
 import (
     "context"
     "log"
+    "os"
+    "os/signal"
+    "syscall"
 
     "github.com/gin-gonic/gin"
     "github.com/mrtroian/notes/internal/api"
-    web "github.com/mrtroian/notes/internal/application"
+    "github.com/mrtroian/notes/internal/config"
     "github.com/mrtroian/notes/internal/database"
-    "github.com/mrtroian/notes/internal/middleware"
-    "github.com/mrtroian/notes/internal/rts"
-    "github.com/mrtroian/notes/internal/signals"
+    "github.com/mrtroian/notes/internal/note"
+    "github.com/mrtroian/notes/internal/user"
 )
 
+var sigChannel = make(chan os.Signal)
+
+func ShutdownHandler(cancelFunc context.CancelFunc) {
+    go func() {
+        // kill -9 doesn't sound like a graceful shutdown
+        // add syscall.SIGKILL otherwise
+        signal.Notify(sigChannel, syscall.SIGINT, syscall.SIGTERM)
+
+        for sig := range sigChannel {
+            switch sig {
+            case os.Interrupt:
+                cancelFunc()
+                return
+            }
+        }
+    }()
+}
+
 func main() {
-    if err := rts.IsValid(); err != nil {
+    if err := config.IsValid(); err != nil {
         log.Fatal(err)
     }
 
     ctx, cancel := context.WithCancel(context.Background())
-    router := gin.Default()
-    db, err := database.Initialize()
+    db, err := database.Init()
 
     if err != nil {
         log.Fatal(err)
     }
 
-    signals.Handle(cancel)
-    router.Use(database.Add(db))
-    router.Use(middleware.JWTMiddleware())
-    api.ApplyRoutes(router)
-    web.ApplyRoute(router)
-    web.UseRouter(router)
-    web.Start()
-    defer web.Stop()
+    user.Init(db)
+    note.Init(db)
+
+    ShutdownHandler(cancel)
+    api.Start(gin.Default())
+    defer api.Stop()
 
     <-ctx.Done()
 }

@@ -8,7 +8,7 @@ import (
     "time"
 
     "github.com/gin-gonic/gin"
-    "github.com/mrtroian/notes/internal/rts"
+    "github.com/mrtroian/notes/internal/config"
 )
 
 var srv *http.Server
@@ -38,5 +38,5 @@ func Stop() {
 
 func init() {
     srv = new(http.Server)
-    srv.Addr = fmt.Sprintf("%s:%s", rts.GetHost(), rts.GetPort())
+    srv.Addr = fmt.Sprintf("%s:%s", config.GetHost(), config.GetPort())
 }

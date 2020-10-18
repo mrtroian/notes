@@ -7,20 +7,19 @@ import (
     "github.com/jinzhu/gorm"
     _ "github.com/jinzhu/gorm/dialects/sqlite"
 
-    "github.com/mrtroian/notes/internal/database/models"
+    "github.com/mrtroian/notes/internal/config"
     "github.com/mrtroian/notes/internal/note"
-    "github.com/mrtroian/notes/internal/rts"
 )
 
-func Migrate(db *gorm.DB) {
+func autoMigrate(db *gorm.DB) {
     db.AutoMigrate(&user.User{}, &note.Note{})
     db.Model(&note.Note{}).AddForeignKey("user_id", "users(id)", "CASCADE", "CASCADE")
     log.Println("Auto Migration has beed processed")
 }
 
 // Initialize the database
-func Initialize() (*gorm.DB, error) {
-    dbPath := rts.GetDBPath()
+func Init() (*gorm.DB, error) {
+    dbPath := config.GetDBPath()
     db, err := gorm.Open("sqlite3", dbPath)
 
     if err != nil {
@@ -28,7 +27,7 @@ func Initialize() (*gorm.DB, error) {
     }
 
     db.LogMode(true)
-    models.Migrate(db)
+    autoMigrate(db)
 
     log.Println("Connected to database")
 

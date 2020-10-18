@@ -30,9 +30,10 @@ func ExistsWithUsername(u string) bool {
 	return false
 }
 
-func Save(user *User) {
+func Save(user *User) error {
 	database.NewRecord(user)
 	database.Create(&user)
+	return nil
 }
 
 func Init(db *gorm.DB) {

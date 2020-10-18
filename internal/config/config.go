@@ -1,4 +1,4 @@
-package rts
+package config
 
 import (
     "errors"
@@ -9,8 +9,7 @@ import (
 )
 
 /*
-   RTS - runtime storage.
-   Manages configuration in runtime.
+   config - configuration storage
 */
 
 type storage struct {
@@ -21,7 +20,7 @@ type storage struct {
     secret string
 }
 
-var runtimeStorage storage
+var rs storage
 
 func newStorage(port, host, dbConf, dbPath, secret string) storage {
     return storage{
@@ -34,47 +33,47 @@ func newStorage(port, host, dbConf, dbPath, secret string) storage {
 }
 
 func GetPort() string {
-    return runtimeStorage.port
+    return rs.port
 }
 
 func GetHost() string {
-    return runtimeStorage.host
+    return rs.host
 }
 
 func GetDBConfig() string {
-    return runtimeStorage.dbConf
+    return rs.dbConf
 }
 
 func GetDBPath() string {
-    return runtimeStorage.dbPath
+    return rs.dbPath
 }
 
 func GetSecret() string {
-    return runtimeStorage.secret
+    return rs.secret
 }
 
 func IsValid() error {
     // @TODO: Validation
-    s := runtimeStorage
+    s := rs
 
     if len(s.port) == 0 {
-        return errors.New("rts: cannot read PORT from env")
+        return errors.New("config: cannot read PORT from env")
     }
 
     if len(s.host) == 0 {
-        return errors.New("rts: cannot read HOST from env")
+        return errors.New("config: cannot read HOST from env")
     }
 
     if len(s.dbConf) == 0 {
-        return errors.New("rts: cannot read DB_CONF from env")
+        return errors.New("config: cannot read DB_CONF from env")
     }
 
     if len(s.dbPath) == 0 {
-        return errors.New("rts: cannot read SQLITE_PATH from env")
+        return errors.New("config: cannot read SQLITE_PATH from env")
     }
 
     if len(s.secret) == 0 {
-        return errors.New("rts: cannot read SECRET_KEY from env")
+        return errors.New("config: cannot read SECRET_KEY from env")
     }
 
     return nil
@@ -87,7 +86,7 @@ func init() {
         log.Fatal(err)
     }
 
-    runtimeStorage = newStorage(
+    rs = newStorage(
         os.Getenv("PORT"),
         os.Getenv("HOST"),
         os.Getenv("DB_CONF"),

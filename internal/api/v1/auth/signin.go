@@ -6,7 +6,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/mrtroian/notes/internal/api/internal/request"
-	"github.com/mrtroian/notes/internal/common"
 	"github.com/mrtroian/notes/internal/hash"
 	"github.com/mrtroian/notes/internal/token"
 	"github.com/mrtroian/notes/internal/user"
@@ -46,7 +45,7 @@ func signin(c *gin.Context) {
 	}
 
 	c.SetCookie("token", t, weekTime, "/", "", false, true)
-	c.JSON(http.StatusOK, common.JSON{
+	c.JSON(http.StatusOK, map[string]interface{}{
 		"user":  u.Serialize(),
 		"token": t,
 	})

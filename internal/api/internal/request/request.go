@@ -6,12 +6,30 @@ type Register struct {
 	Password string `json:"password" binding:"required"`
 }
 
+func NewRegister() *Register {
+	return new(Register)
+}
+
+func (*Register) Reset() {}
+
 type Login struct {
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 
-type Create struct {
+func NewLogin() *Login {
+	return new(Login)
+}
+
+func (*Login) Reset() {}
+
+type CreateNote struct {
 	Title string `json:"Title" binding:"required"`
 	Text  string `json:"text" binding:"required"`
 }
+
+func NewCreateNote() *CreateNote {
+	return new(CreateNote)
+}
+
+func (*CreateNote) Reset() {}

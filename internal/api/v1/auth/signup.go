@@ -3,12 +3,12 @@ package auth
 import (
 	"log"
 	"net/http"
-	"os/user"
 
 	"github.com/gin-gonic/gin"
+	"github.com/mrtroian/notes/internal/api/internal/request"
 	"github.com/mrtroian/notes/internal/hash"
-	"github.com/mrtroian/notes/internal/request"
 	"github.com/mrtroian/notes/internal/token"
+	"github.com/mrtroian/notes/internal/user"
 )
 
 func signup(c *gin.Context) {
@@ -34,18 +34,20 @@ func signup(c *gin.Context) {
 		return
 	}
 
-	u := user.NewUser(body.Username, body.Email, hs)
+	u := &user.User{
+		Username:     body.Username,
+		Email:        body.Email,
+		PasswordHash: hs,
+	}
 
-	err := user.Save(u)
-
-	if err != nil {
+	if err := user.Save(u); err != nil {
 		log.Println(err)
 		// Actually, any server side error
 		c.AbortWithStatus(http.StatusTeapot)
 		return
 	}
 
-	t, err := token.Generate(user)
+	t, err := token.Generate(u)
 
 	if err != nil {
 		log.Println(err)
