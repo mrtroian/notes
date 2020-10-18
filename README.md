@@ -8,12 +8,13 @@ Notes-App should allow users to create notes, view them, delete and update, as w
 * REST API based on Gin
 * GORM as ORM
 * SQLite database
-* Flutter SPA Frontend (in development)
 
 ### About dev plans:
-* finnish basic frontend
+* SPA Frontend [WIP]
 * migrate from sqlite to postgres
-* migrate from GORM to Kallax
+* migrate from GORM
+* Makefile
+* tests
 * add prometheus metrics
 * dockerize
 
