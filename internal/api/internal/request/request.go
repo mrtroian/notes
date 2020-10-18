@@ -10,6 +10,7 @@ func NewRegister() *Register {
 	return new(Register)
 }
 
+// Stub for objpool
 func (*Register) Reset() {}
 
 type Login struct {

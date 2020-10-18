@@ -5,7 +5,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/mrtroian/notes/internal/token"
+
+	"github.com/mrtroian/notes/internal/api/internal/token"
 	"github.com/mrtroian/notes/internal/user"
 )
 
